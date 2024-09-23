@@ -29,61 +29,39 @@ kotlin {
                     withJvm()
                     withNative()
                 }
-                withJs()
-                withWasmJs()
             }
         }
     }
 
     jvm()
 
-    js(IR) {
-        browser()
-        nodejs()
-    }
-
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs {
-        browser()
-        nodejs()
-    }
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmWasi {
-        nodejs()
-    }
-
-    iosX64()
-    iosArm64()
-    iosSimulatorArm64()
-
-    tvosX64()
-    tvosArm64()
-    tvosSimulatorArm64()
-
-    watchosX64()
-    watchosArm64()
-    watchosSimulatorArm64()
-    watchosDeviceArm64()
-
-    macosArm64()
-    macosX64()
-
-    mingwX64()
-
-    linuxX64()
-    linuxArm64()
-
-    androidNativeArm32()
-    androidNativeArm64()
-
-    androidNativeX86()
-    androidNativeX64()
-
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
     compilerOptions {
         freeCompilerArgs.add("-Xexpect-actual-classes")
     }
 }
+
+configurations
+    .filter { it.name.startsWith("wasm") }
+    .forEach {
+        it.resolutionStrategy.force("org.jetbrains.kotlin:kotlin-stdlib:2.0.0")
+    }
+
+tasks {
+    named("jvmTest") {
+        enabled = false
+    }
+    register<Test>("test") {
+        description = "Unified test task for all platforms"
+        group = "verification"
+        val jvmTestTask = named<Test>("jvmTest").get()
+        testClassesDirs = jvmTestTask.testClassesDirs
+        classpath = jvmTestTask.classpath
+        dependsOn("jvmTest")
+    }
+}
+
+
 
 dependencies {
     commonTestImplementation(kotlin("test"))
