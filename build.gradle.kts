@@ -2,10 +2,10 @@
 import org.jetbrains.dokka.base.DokkaBase
 import org.jetbrains.dokka.base.DokkaBaseConfiguration
 import org.jetbrains.dokka.gradle.DokkaMultiModuleTask
-import org.jetbrains.dokka.gradle.DokkaTask
 
 plugins {
     alias(libs.plugins.dokka)
+    id("org.jetbrains.kotlinx.kover") version "0.8.3"
 }
 
 buildscript {
@@ -46,9 +46,4 @@ val dokkaHtmlMultiModule by tasks.getting(DokkaMultiModuleTask::class) {
     pluginConfiguration<DokkaBase, DokkaBaseConfiguration> {
         customAssets += rootProject.layout.projectDirectory.file("website/static/img/logo-icon.svg").asFile
     }
-}
-val syncDocs by tasks.registering(Sync::class) {
-    group = "documentation"
-    from(dokkaHtmlMultiModule.outputDirectory)
-    into(rootProject.layout.projectDirectory.dir("website/static/api_reference"))
 }
